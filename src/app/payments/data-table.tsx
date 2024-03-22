@@ -24,12 +24,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableViewOptions } from "./data-table-view-options"
 import {

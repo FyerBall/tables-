@@ -3,14 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ModeToggle } from "@/components/mode-toggle"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+
 import { BreadcrumbWrapper } from "@/components/ui/breadcrumb-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
