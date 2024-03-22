@@ -1,5 +1,7 @@
 import { faker } from "@faker-js/faker"
 
+export type Status = "pending" | "failed" | "completed"
+
 export type Person = {
   firstName: string
   lastName: string
@@ -22,6 +24,7 @@ export type Category = {
   amount: string
   quantity: number
   subRows?: SubCategory[]
+  status: Status
 }
 
 const range = (len: number) => {
@@ -53,6 +56,11 @@ const newCategory = (): Category => {
     name: faker.commerce.productName(),
     amount: faker.commerce.price(),
     quantity: faker.number.int(100),
+    status: faker.helpers.shuffle<Category["status"]>([
+      "completed",
+      "failed",
+      "pending",
+    ])[0]!,
   }
 }
 

@@ -1,4 +1,16 @@
 "use client"
+// TODO: [ ] use zod to validate the input
+// TODO: [ ] add math operations to the input. example: 2+2 = 4
+// TODO: [ ] resize the input to fit the content
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -11,6 +23,7 @@ import { Category } from "./makeData"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useDebounce } from "../hooks/use-debounce"
+import { Status } from "@/app/types"
 
 export const tasksColumns: ColumnDef<Tasks>[] = [
   {
@@ -273,7 +286,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
             ""
           )}
           {""}
-          <InputCell row={row.original} value={getValue()} column={column} />
+          <InputCell row={row.original} value={getValue()} />
         </div>
       </div>
     ),
@@ -283,7 +296,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
     accessorFn: (row) => row.amount,
     id: "amount",
     cell: ({ getValue, column, row }) => (
-      <InputCell row={row.original} value={getValue()} column={column} />
+      <InputCell row={row.original} value={getValue()} />
     ),
     header: () => <span>Amount</span>,
     footer: (props) => props.column.id,
@@ -292,21 +305,21 @@ export const categoryColumns: ColumnDef<Category>[] = [
     accessorKey: "quantity",
     header: () => "Quantity",
     cell: ({ getValue, column, row }) => (
-      <InputCell row={row.original} value={getValue()} column={column} />
+      <InputCell row={row.original} value={getValue()} />
+    ),
+    footer: (props) => props.column.id,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ getValue, column, row }) => (
+      <DropdownCell row={row.original} value={getValue()} />
     ),
     footer: (props) => props.column.id,
   },
 ]
 
-function InputCell({
-  row,
-  value,
-  column,
-}: {
-  row: Category
-  value: any
-  column: ColumnDef<Category>
-}) {
+function InputCell({ row, value }: { row: Category; value: any }) {
   const [inputValue, setInputValue] = useState(value)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -352,5 +365,45 @@ function InputCell({
         </div>
       )}
     </div>
+  )
+}
+
+function DropdownCell({ row, value }: { row: Category; value: any }) {
+  const [inputValue, setInputValue] = useState(value)
+
+  const handleUpdate = useDebounce((value: string) => {
+    console.log("update", value)
+    console.log("id", row.id)
+  }, 500)
+
+  const handleClicked = (status: Status) => {
+    setInputValue(status)
+    handleUpdate(status)
+  }
+
+  // handle clear status value
+  const handleClear = () => {
+    setInputValue("")
+    handleUpdate("")
+  }
+
+  // Get all the values of the status enum
+  const statusValues = Object.values(Status)
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>{inputValue}</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
+        {statusValues.map((status) => (
+          <DropdownMenuItem key={status} onClick={() => handleClicked(status)}>
+            {status}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem onClick={handleClear}>Clear</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
