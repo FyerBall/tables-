@@ -9,11 +9,19 @@ export type Person = {
   status: "relationship" | "complicated" | "single"
   subRows?: Person[]
 }
-export type Category = {
+
+export type SubCategory = {
   name: string
   amount: string
   quantity: number
-  subRows?: Category[]
+}
+
+export type Category = {
+  id: string
+  name: string
+  amount: string
+  quantity: number
+  subRows?: SubCategory[]
 }
 
 const range = (len: number) => {
@@ -41,6 +49,7 @@ const newPerson = (): Person => {
 
 const newCategory = (): Category => {
   return {
+    id: faker.datatype.uuid(),
     name: faker.commerce.productName(),
     amount: faker.commerce.price(),
     quantity: faker.number.int(100),

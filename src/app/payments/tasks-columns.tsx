@@ -6,9 +6,11 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableColumnHeader } from "./column-header"
 import Actions from "./actions"
 import { Tasks } from "../page"
-import React, { HTMLProps } from "react"
+import React, { HTMLProps, ReactNode, useState } from "react"
 import { Category } from "./makeData"
 import { ChevronDown, ChevronRight } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { useDebounce } from "../hooks/use-debounce"
 
 export const tasksColumns: ColumnDef<Tasks>[] = [
   {
@@ -212,8 +214,9 @@ export const peopleColumns: ColumnDef<Person>[] = [
 export const categoryColumns: ColumnDef<Category>[] = [
   {
     accessorKey: "name",
+    size: 400,
     header: ({ table }) => (
-      <div className=" flex items-center">
+      <div className=" flex items-center ">
         <IndeterminateCheckbox
           {...{
             checked: table.getIsAllRowsSelected(),
@@ -232,10 +235,10 @@ export const categoryColumns: ColumnDef<Category>[] = [
             <ChevronRight size={18} className="text-gray-500" />
           )}
         </button>{" "}
-        Name
+        <p className="">Name</p>
       </div>
     ),
-    cell: ({ row, getValue }) => (
+    cell: ({ row, getValue, column }) => (
       <div
         style={{
           // Since rows are flattened by default,
@@ -270,7 +273,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
             ""
           )}
           {""}
-          <p className="font-semibold">{getValue<boolean>()}</p>
+          <InputCell row={row.original} value={getValue()} column={column} />
         </div>
       </div>
     ),
@@ -279,13 +282,75 @@ export const categoryColumns: ColumnDef<Category>[] = [
   {
     accessorFn: (row) => row.amount,
     id: "amount",
-    cell: (info) => info.getValue(),
+    cell: ({ getValue, column, row }) => (
+      <InputCell row={row.original} value={getValue()} column={column} />
+    ),
     header: () => <span>Amount</span>,
     footer: (props) => props.column.id,
   },
   {
     accessorKey: "quantity",
     header: () => "Quantity",
+    cell: ({ getValue, column, row }) => (
+      <InputCell row={row.original} value={getValue()} column={column} />
+    ),
     footer: (props) => props.column.id,
   },
 ]
+
+function InputCell({
+  row,
+  value,
+  column,
+}: {
+  row: Category
+  value: any
+  column: ColumnDef<Category>
+}) {
+  const [inputValue, setInputValue] = useState(value)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleUpdate = useDebounce((value: string) => {
+    console.log("update", value)
+    console.log("id", row.id)
+  }, 500)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target
+
+    setInputValue(value)
+    handleUpdate(value)
+  }
+
+  return (
+    <div
+      className="flex items-center"
+      onClick={() => {
+        setIsEditing(true)
+        setTimeout(() => {
+          inputRef.current?.focus()
+        }, 0)
+      }}
+    >
+      {isEditing ? (
+        <Input
+          ref={inputRef}
+          value={inputValue}
+          onChange={handleChange}
+          onBlur={() => setIsEditing(false)}
+          id={row.id}
+          name={row.name}
+        />
+      ) : (
+        <div
+          onClick={() => setIsEditing(true)}
+          className="cursor-pointer"
+          title="Click to edit"
+        >
+          {inputValue}
+        </div>
+      )}
+    </div>
+  )
+}
