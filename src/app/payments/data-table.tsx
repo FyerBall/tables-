@@ -12,6 +12,8 @@ import {
   ColumnFiltersState,
   getFilteredRowModel,
   VisibilityState,
+  ExpandedState,
+  getExpandedRowModel,
 } from "@tanstack/react-table"
 
 import {
@@ -36,6 +38,15 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
+// interface DataTableProps<TData extends { subRows?: TData[] }, TValue> {
+//   columns: ColumnDef<TData, TValue>[]
+//   data: TData[]
+// }
+
+// export function DataTable<TData extends { subRows?: TData[] }, TValue>({
+//   columns,
+//   data,
+// }: DataTableProps<TData, TValue>) {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -56,6 +67,8 @@ export function DataTable<TData, TValue>({
 
   const [globalFilter, setGlobalFilter] = React.useState("")
 
+  const [expanded, setExpanded] = React.useState<ExpandedState>({})
+
   const table = useReactTable({
     data,
     columns,
@@ -68,6 +81,11 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
+    onExpandedChange: setExpanded,
+    getExpandedRowModel: getExpandedRowModel(),
+    // @ts-expect-error TODO: fix this
+    getSubRows: (row) => row.subRows,
+
     // getFacetedRowModel: getFacetedRowModel(),
     // getFacetedUniqueValues: getFacetedUniqueValues(),
     // getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -79,6 +97,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       globalFilter,
+      expanded,
     },
   })
 
