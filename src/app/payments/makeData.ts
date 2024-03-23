@@ -24,6 +24,7 @@ export type Category = {
   amount: string
   quantity: number
   subRows?: SubCategory[]
+  dueDate: Date
   status: Status
 }
 
@@ -61,6 +62,7 @@ const newCategory = (): Category => {
       "failed",
       "pending",
     ])[0]!,
+    dueDate: faker.date.future(),
   }
 }
 

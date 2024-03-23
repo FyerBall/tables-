@@ -2,7 +2,8 @@
 // TODO: [ ] use zod to validate the input
 // TODO: [ ] add math operations to the input. example: 2+2 = 4
 // TODO: [ ] resize the input to fit the content
-
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +21,11 @@ import Actions from "./actions"
 import { Tasks } from "../page"
 import React, { HTMLProps, ReactNode, useState } from "react"
 import { Category } from "./makeData"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { Calendar, ChevronDown, ChevronRight, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useDebounce } from "../hooks/use-debounce"
 import { Status } from "@/app/types"
+import { Button } from "@/components/ui/button"
 
 export const tasksColumns: ColumnDef<Tasks>[] = [
   {
@@ -301,19 +303,28 @@ export const categoryColumns: ColumnDef<Category>[] = [
     header: () => <span>Amount</span>,
     footer: (props) => props.column.id,
   },
-  {
-    accessorKey: "quantity",
-    header: () => "Quantity",
-    cell: ({ getValue, column, row }) => (
-      <InputCell row={row.original} value={getValue()} />
-    ),
-    footer: (props) => props.column.id,
-  },
+  // {
+  //   accessorKey: "quantity",
+  //   header: () => "Quantity",
+  //   cell: ({ getValue, column, row }) => (
+  //     <InputCell row={row.original} value={getValue()} />
+  //   ),
+  //   footer: (props) => props.column.id,
+  // },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ getValue, column, row }) => (
       <DropdownCell row={row.original} value={getValue()} />
+    ),
+    footer: (props) => props.column.id,
+  },
+
+  {
+    accessorKey: "dueDate",
+    header: "Due Date",
+    cell: ({ getValue, column, row }) => (
+      <DateCell row={row.original} value={getValue()} />
     ),
     footer: (props) => props.column.id,
   },
@@ -405,5 +416,76 @@ function DropdownCell({ row, value }: { row: Category; value: any }) {
         <DropdownMenuItem onClick={handleClear}>Clear</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+interface DateCustomInputProps {
+  value: Date | string
+  clearData: () => void
+  onClick?: () => void
+}
+
+const DateCustomInput = React.forwardRef<
+  HTMLButtonElement,
+  DateCustomInputProps
+>(({ value, onClick, clearData }, ref) =>
+  value ? (
+    <div className="flex items-center">
+      <Button variant={"outline"} ref={ref} onClick={onClick}>
+        {value as ReactNode}
+      </Button>
+      <Button
+        variant={"outline"}
+        onClick={() => clearData()}
+        ref={ref}
+        size={"icon"}
+        style={{ cursor: "pointer" }}
+        title="Clear date"
+      >
+        <X size={12} />
+      </Button>
+    </div>
+  ) : (
+    <Button
+      variant={"outline"}
+      onClick={onClick}
+      ref={ref}
+      size={"icon"}
+      style={{ cursor: "pointer" }}
+      title="Clear date"
+    >
+      <Calendar className="text-gray-500" />
+    </Button>
+  )
+)
+
+DateCustomInput.displayName = "DateCustomInput"
+
+function DateCell({ row, value }: { row: Category; value: any }) {
+  const [inputValue, setInputValue] = useState(value)
+
+  const handleUpdate = useDebounce((value: string) => {
+    console.log("update", value)
+    console.log("id", row.id)
+  }, 500)
+
+  const handleChange = (date: any) => {
+    setInputValue(date)
+    handleUpdate(date)
+  }
+
+  const clearData = () => {
+    setInputValue("")
+    handleUpdate("")
+  }
+
+  return (
+    <DatePicker
+      wrapperClassName=""
+      dateFormat={"dd/MM/yyyy"}
+      selected={inputValue}
+      onChange={handleChange}
+      customInput={<DateCustomInput value={inputValue} clearData={clearData} />}
+    />
   )
 }
