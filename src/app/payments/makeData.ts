@@ -26,6 +26,7 @@ export type Category = {
   subRows?: SubCategory[]
   dueDate: Date
   status: Status
+  emoji?: string
 }
 
 const range = (len: number) => {
@@ -55,7 +56,8 @@ const newCategory = (): Category => {
   return {
     id: faker.datatype.uuid(),
     name: faker.commerce.productName(),
-    amount: faker.commerce.price(),
+    // amount: faker.commerce.price(),
+    amount: "0123456789",
     quantity: faker.number.int(100),
     status: faker.helpers.shuffle<Category["status"]>([
       "completed",
@@ -63,6 +65,32 @@ const newCategory = (): Category => {
       "pending",
     ])[0]!,
     dueDate: faker.date.future(),
+    emoji: faker.helpers.shuffle([
+      "😀",
+      "😎",
+      "🤯",
+      "🤔",
+      "😳",
+      "🤗",
+      "😏",
+      "😍",
+      "😂",
+      "🤣",
+      "😇",
+      "🥰",
+      "😜",
+      "😝",
+      "🤑",
+      "🤩",
+      "🥳",
+      "🥺",
+      "😢",
+      "😭",
+      "😤",
+      "😠",
+      "😡",
+      "🤬",
+    ])[0],
   }
 }
 

@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { useDebounce } from "../hooks/use-debounce"
 import { Status } from "@/app/types"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export const tasksColumns: ColumnDef<Tasks>[] = [
   {
@@ -98,7 +99,7 @@ function ShowTasks({ row }: { row: Tasks }) {
   return <div>{row.title}</div>
 }
 
-function IndeterminateCheckbox({
+export function IndeterminateCheckbox({
   indeterminate,
   className = "",
   ...rest
@@ -229,9 +230,8 @@ export const peopleColumns: ColumnDef<Person>[] = [
 export const categoryColumns: ColumnDef<Category>[] = [
   {
     accessorKey: "name",
-    size: 400,
     header: ({ table }) => (
-      <div className=" flex items-center ">
+      <div className=" flex items-center gap-2">
         <IndeterminateCheckbox
           {...{
             checked: table.getIsAllRowsSelected(),
@@ -260,10 +260,10 @@ export const categoryColumns: ColumnDef<Category>[] = [
           // we can use the row.depth property
           // and paddingLeft to visually indicate the depth
           // of the row
-          paddingLeft: `${row.depth * 1}rem`,
+          paddingLeft: `${row.depth * 1.5}rem`,
         }}
       >
-        <div className="flex items-start ">
+        <div className="flex items-center gap-2 ">
           <IndeterminateCheckbox
             {...{
               checked: row.getIsSelected(),
@@ -288,7 +288,18 @@ export const categoryColumns: ColumnDef<Category>[] = [
             ""
           )}
           {""}
-          <InputCell row={row.original} value={getValue()} />
+          <div className="flex items-center ">
+            <div className="  rounded  text-base mr-2">
+              <span className="bg-gray-500/50 px-[3px] py-[2px] rounded ">
+                {row.original.emoji}
+              </span>
+            </div>
+            <InputCell
+              row={row.original}
+              value={getValue()}
+              className=" w-48"
+            />
+          </div>
         </div>
       </div>
     ),
@@ -300,17 +311,19 @@ export const categoryColumns: ColumnDef<Category>[] = [
     cell: ({ getValue, column, row }) => (
       <InputCell row={row.original} value={getValue()} />
     ),
-    header: () => <span>Amount</span>,
+    header: () => <p className="w-8">Amount</p>,
     footer: (props) => props.column.id,
   },
-  // {
-  //   accessorKey: "quantity",
-  //   header: () => "Quantity",
-  //   cell: ({ getValue, column, row }) => (
-  //     <InputCell row={row.original} value={getValue()} />
-  //   ),
-  //   footer: (props) => props.column.id,
-  // },
+  {
+    accessorKey: "quantity",
+    header: () => "Quantity",
+    cell: ({ getValue, column, row }) => (
+      <div className="">
+        <InputCell row={row.original} value={getValue()} />
+      </div>
+    ),
+    footer: (props) => props.column.id,
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -319,7 +332,6 @@ export const categoryColumns: ColumnDef<Category>[] = [
     ),
     footer: (props) => props.column.id,
   },
-
   {
     accessorKey: "dueDate",
     header: "Due Date",
@@ -330,7 +342,15 @@ export const categoryColumns: ColumnDef<Category>[] = [
   },
 ]
 
-function InputCell({ row, value }: { row: Category; value: any }) {
+export function InputCell({
+  row,
+  value,
+  className,
+}: {
+  row: Category
+  value: any
+  className?: string
+}) {
   const [inputValue, setInputValue] = useState(value)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -349,7 +369,7 @@ function InputCell({ row, value }: { row: Category; value: any }) {
 
   return (
     <div
-      className="flex items-center"
+      className={cn("flex items-center", className)}
       onClick={() => {
         setIsEditing(true)
         setTimeout(() => {
@@ -365,6 +385,8 @@ function InputCell({ row, value }: { row: Category; value: any }) {
           onBlur={() => setIsEditing(false)}
           id={row.id}
           name={row.name}
+          variant={"cell"}
+          className={cn(className)}
         />
       ) : (
         <div

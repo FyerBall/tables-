@@ -38,15 +38,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-// interface DataTableProps<TData extends { subRows?: TData[] }, TValue> {
-//   columns: ColumnDef<TData, TValue>[]
-//   data: TData[]
-// }
+import { Search } from "./search-input"
+import TableGlobalFilter from "@/components/table-global-filter"
 
-// export function DataTable<TData extends { subRows?: TData[] }, TValue>({
-//   columns,
-//   data,
-// }: DataTableProps<TData, TValue>) {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -60,6 +54,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
+
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
@@ -72,6 +67,14 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+      expanded,
+    },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -89,23 +92,19 @@ export function DataTable<TData, TValue>({
     // getFacetedRowModel: getFacetedRowModel(),
     // getFacetedUniqueValues: getFacetedUniqueValues(),
     // getFacetedMinMaxValues: getFacetedMinMaxValues(),
-
-    filterFromLeafRows: true, // filter and search through sub-rows
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      globalFilter,
-      expanded,
-    },
+    // filterFromLeafRows: true, // filter and search through sub-rows
   })
 
   return (
     <Card className="">
       <CardHeader className="flex items-center py-4 justify-between space-y-5">
         <CardTitle>
-          <DebouncedInput
+          {/* <FilterBy
+            columnFilters={columnFilters}
+            setColumnFilters={setColumnFilters}
+          /> */}
+
+          <TableGlobalFilter
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             className="p-2 font-lg shadow border border-block"
@@ -164,39 +163,5 @@ export function DataTable<TData, TValue>({
         <DataTablePagination table={table} />
       </CardFooter>
     </Card>
-  )
-}
-
-// A debounced input react component
-function DebouncedInput({
-  value: initialValue,
-  onChange,
-  debounce = 500,
-  ...props
-}: {
-  value: string | number
-  onChange: (value: string | number) => void
-  debounce?: number
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
-  const [value, setValue] = React.useState(initialValue)
-
-  React.useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
-
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value)
-    }, debounce)
-
-    return () => clearTimeout(timeout)
-  }, [value, debounce, onChange])
-
-  return (
-    <Input
-      {...props}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
   )
 }

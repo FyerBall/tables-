@@ -9,6 +9,18 @@ async function getData(): Promise<Payment[]> {
       amount: 100,
       status: "pending",
       email: "m@example.com",
+      subRows: [
+        {
+          id: "728edd52f",
+          name: "Item 1",
+          status: "pending",
+        },
+        {
+          id: "728edd52f",
+          name: "Item 2",
+          status: "pending",
+        },
+      ],
     },
     {
       id: "mfei3rwfsdsoief",

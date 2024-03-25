@@ -273,7 +273,6 @@ export default function Home() {
   const [categoryData, setCategoryData] = React.useState(() =>
     makeCategoryData(100, 5, 3)
   )
-  console.log(categoryData)
 
   return (
     <main className="container p-4">

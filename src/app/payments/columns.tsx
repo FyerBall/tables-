@@ -5,6 +5,14 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 import { DataTableColumnHeader } from "./column-header"
 import Actions from "./actions"
+import { ChevronDown, ChevronRight } from "lucide-react"
+import { IndeterminateCheckbox, InputCell } from "./tasks-columns"
+
+type Items = {
+  id: string
+  name: string
+  status: "pending" | "success" | "failed"
+}
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -13,6 +21,7 @@ export type Payment = {
   amount: number
   status: "pending" | "processing" | "success" | "failed"
   email: string
+  subRows?: Items[]
 }
 
 export const columns: ColumnDef<Payment>[] = [
@@ -40,7 +49,9 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "status",
-    header: ({ column }) => <div>Status</div>,
+    header: ({ column, table, header }) => {
+      return <div className="">Status</div>
+    },
   },
 
   {
